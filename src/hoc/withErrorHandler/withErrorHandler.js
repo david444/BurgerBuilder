@@ -8,15 +8,20 @@ const withErrorHandler = (WrappedComponent, axios) => {
             error: null
         }
 
-        componentDidMount() {
-            axios.interceptors.request.use(req => {
+        componentWillMount() {
+            this.requestInterceptor = axios.interceptors.request.use(req => {
                 this.setState({ error: null });
                 return req;
             })
-            axios.interceptors.response.use(res => res, error => {
-                this.setState({ error: error })
-
+            this.responseInterceptor = axios.interceptors.response.use(res => res, error => {
+                this.setState({ error: error });
             });
+        }
+
+        //With this, the interceptors will be removed, once they are used. This will prevent memory leak when routing is introduced
+        componentWillUnmount(){
+            axios.interceptors.request.eject(this.requestInterceptor);
+            axios.interceptors.request.eject(this.responseInterceptor);
         }
 
         errorConfirmedHander = () => {

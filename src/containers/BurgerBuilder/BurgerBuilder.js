@@ -25,16 +25,17 @@ class BurgerBuilder extends Component {
         purchaseable: false,
         purchasing: false,
         loading: false,
-        error:false
+        error: false
     }
 
     componentDidMount() {
+        //Only components loaded by route, will have the this.props.match properties,nested dont have them. If you wrap the component with the function 'withRoute', the properties will appear.
         axios.get('https://react-my-burger-a36b6.firebaseio.com/ingridients.json')
             .then(response => {
                 this.setState({ ingridients: response.data });
             })
-            .catch(error=>{
-                this.setState({error:true})
+            .catch(error => {
+                this.setState({ error: true })
             })
     }
     updatePurchaseState(ingridients) {
@@ -46,6 +47,7 @@ class BurgerBuilder extends Component {
             }, 0);
         this.setState({ purchaseable: sum > 0 });
     }
+
     addIngridientHandler = (type) => {
         const oldCount = this.state.ingridients[type];
         const updateCount = oldCount + 1;
@@ -87,30 +89,19 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinueHandler = () => {
-        // alert('You continue!');
-        this.setState({ loading: true });
-        const order = {
-            ingridients: this.state.ingridients,
-            price: this.state.totalPrice, //in production this would be calculated in the server, so the user don't manipulate the price
-            customer: {
-                name: 'Pollo',
-                address: {
-                    street: 'Test 1',
-                    zipCode: '1512',
-                    country: 'Germany'
-                },
-                email: 'test@dummy.com',
-            },
-            deliveryMethod: 'fastest'
+
+        const queryParams = [];
+        queryParams.push('price=' + this.state.totalPrice);
+        for (let i in this.state.ingridients) {
+            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingridients[i]));
         }
-        axios.post('/orders.json', order)
-            .then(response => {
-                this.setState({ loading: false, purchasing: false });
-            })
-            .catch(error => {
-                this.setState({ loading: false, purchasing: false });
-            });
+        const queryString = queryParams.join('&');
+        this.props.history.push({
+            pathname: '/checkout',
+            search: '?' + queryString
+        });
     }
+
     render() {
         const disabledInfo = {
             ...this.state.ingridients
@@ -120,7 +111,7 @@ class BurgerBuilder extends Component {
         }
         let orderSummary = null;
 
-        let burger = this.state.error?<p>Ingridients can't be loaded</p> :<Spinner />
+        let burger = this.state.error ? <p>Ingridients can't be loaded</p> : <Spinner />
         if (this.state.ingridients) {
             burger = (
                 <Aux>

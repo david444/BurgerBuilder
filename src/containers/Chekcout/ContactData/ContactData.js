@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+
 import Button from '../../../components/UI/Button/Button';
 import classes from './ContactData.module.css';
 import axios from '../../../axios-orders';
@@ -89,7 +91,7 @@ class ContactData extends Component {
                     ]
                 },
                 value: 'fastest',
-                validation:{},
+                validation: {},
                 valid: true
             }
         },
@@ -111,7 +113,7 @@ class ContactData extends Component {
 
         let formIsValid = true;
         for (let inputIdentifier in updatedForm) {
-            formIsValid = updatedForm[inputIdentifier].valida && formIsValid;
+            formIsValid = updatedForm[inputIdentifier].valid && formIsValid;
         }
 
         this.setState({ orderForm: updatedForm, formIsValid });
@@ -120,7 +122,7 @@ class ContactData extends Component {
     checkValidity(value, rule) {
         let isValid = true;
 
-        if(!rule) return isValid;
+        if (!rule) return isValid;
 
         if (rule.required) {
             isValid = value.trim() !== '' && isValid;
@@ -146,7 +148,7 @@ class ContactData extends Component {
             formData[key] = this.state.orderForm[key].value;
         }
         const order = {
-            ingridients: this.props.ingridients,
+            ingridients: this.props.ings,
             price: this.props.price, //in production this would be calculated in the server, so the user don't manipulate the price
             orderData: formData
         }
@@ -197,4 +199,11 @@ class ContactData extends Component {
     }
 }
 
-export default ContactData;
+const mapStateToProps = state => {
+    return {
+        ing: state.ingridients,
+        price: state.totalPrice
+    }
+}
+
+export default connect(mapStateToProps)(ContactData);

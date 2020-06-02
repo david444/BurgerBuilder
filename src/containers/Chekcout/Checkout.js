@@ -7,7 +7,6 @@ import ContactData from './ContactData/ContactData';
 
 class Checkout extends Component {
 
-
     checkoutCancelledHandler = () => {
         this.props.history.goBack();
     }
@@ -19,10 +18,12 @@ class Checkout extends Component {
     render() {
         return (
             <div>
-                <CheckoutSummary ingridients={this.props.ingridients}
+                <CheckoutSummary 
+                    ingridients={this.props.ings}
                     checkoutCancelled={this.checkoutCancelledHandler}
                     checkoutContinued={this.checkoutContinuedHandler} />
-                <Route path={this.props.match.path + '/contact-data'} render={(props) => (<ContactData ingridients={this.state.ingridients} price={this.state.totalPrice} {...props} />)} />
+                <Route path={this.props.match.path + '/contact-data'} 
+                component={ContactData} />
             </div>
         )
     }
@@ -30,8 +31,7 @@ class Checkout extends Component {
 
 const mapStateToProps = state => {
     return { 
-        ings: state.ingridients,
-        price: state.totalPrice
+        ings: state.ingridients
     }
 }
 

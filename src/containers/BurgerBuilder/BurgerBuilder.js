@@ -6,20 +6,19 @@ import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls'
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
-import axios from '../../axios-orders';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
-import * as actionTypes from '../../store/actions';
+import * as burgerBuilderActions from '../../store/actions/';
+import axios from '../../axios-orders';
 
 class BurgerBuilder extends Component {
     state = {   //modern approach
-        purchasing: false,
-        loading: false,
-        error: false
+        purchasing: false
     }
 
     componentDidMount() {
         console.log(this.props);
+        this.props.onInitIngridients();
         //Only components loaded by route, will have the this.props.match properties,nested dont have them. If you wrap the component with the function 'withRoute', the properties will appear.
         // axios.get('https://react-my-burger-a36b6.firebaseio.com/ingridients.json')
         //     .then(response => {
@@ -62,7 +61,7 @@ class BurgerBuilder extends Component {
         }
         let orderSummary = null;
 
-        let burger = this.state.error ? <p>Ingridients can't be loaded</p> : <Spinner />
+        let burger = this.props.error ? <p>Ingridients can't be loaded</p> : <Spinner />
         if (this.props.ingridients) {
             burger = (
                 <Aux>
@@ -84,9 +83,6 @@ class BurgerBuilder extends Component {
                 price={this.props.totalPrice}
             />
         }
-        if (this.state.loading) {
-            orderSummary = <Spinner />
-        }
         return (
             <Aux>
                 <Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler}>
@@ -101,14 +97,16 @@ class BurgerBuilder extends Component {
 const mapStateToProps = (state) => {
     return {
         ingridients: state.ingridients,
-        totalPrice: state.totalPrice
+        totalPrice: state.totalPrice,
+        error: state.error
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        onIngridientAdded: (ingridient) => dispatch({ type: actionTypes.ADD_INGRIDIENT, ingridientName: ingridient }),
-        onIngridientRemoved: (ingridient) => dispatch({ type: actionTypes.REMOVE_INGRIDIENT, ingridientName: ingridient })
+        onIngridientAdded: (ingridient) => dispatch(burgerBuilderActions.addIngridient(ingridient)),
+        onIngridientRemoved: (ingridient) => dispatch(burgerBuilderActions.removeIngridient(ingridient)),
+        onInitIngridients: ()=> dispatch(burgerBuilderActions.initIngridients())
     }
 }
 

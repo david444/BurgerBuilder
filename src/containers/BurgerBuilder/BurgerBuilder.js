@@ -8,7 +8,7 @@ import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
-import * as burgerBuilderActions from '../../store/actions/';
+import * as actions from '../../store/actions/';
 import axios from '../../axios-orders';
 
 class BurgerBuilder extends Component {
@@ -49,6 +49,7 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinueHandler = () => {
+        this.props.onInitPurchased();
         this.props.history.push('/checkout');
     }
 
@@ -96,17 +97,18 @@ class BurgerBuilder extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        ingridients: state.ingridients,
-        totalPrice: state.totalPrice,
-        error: state.error
+        ingridients: state.burgerBuilder.ingridients,
+        totalPrice: state.burgerBuilder.totalPrice,
+        error: state.burgerBuilder.error
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        onIngridientAdded: (ingridient) => dispatch(burgerBuilderActions.addIngridient(ingridient)),
-        onIngridientRemoved: (ingridient) => dispatch(burgerBuilderActions.removeIngridient(ingridient)),
-        onInitIngridients: ()=> dispatch(burgerBuilderActions.initIngridients())
+        onIngridientAdded: (ingridient) => dispatch(actions.addIngridient(ingridient)),
+        onIngridientRemoved: (ingridient) => dispatch(actions.removeIngridient(ingridient)),
+        onInitIngridients: ()=> dispatch(actions.initIngridients()),
+        onInitPurchased: ()=> dispatch(actions.purchaseInit())
     }
 }
 

@@ -8,6 +8,10 @@ import * as actions from '../../store/actions';
 
 class Checkout extends Component {
 
+    componentWillMount() {
+        this.props.onInitPurchased();
+    }
+
     checkoutCancelledHandler = () => {
         this.props.history.goBack();
     }
@@ -45,4 +49,10 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps)(Checkout);
+const mapDispatchToProps = dispatch => {
+    return {
+        onInitPurchased: () => { dispatch(actions.purchaseInit()) }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Checkout);

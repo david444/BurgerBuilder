@@ -17,7 +17,6 @@ class BurgerBuilder extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props);
         this.props.onInitIngridients();
         //Only components loaded by route, will have the this.props.match properties,nested dont have them. If you wrap the component with the function 'withRoute', the properties will appear.
         // axios.get('https://react-my-burger-a36b6.firebaseio.com/ingridients.json')

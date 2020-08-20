@@ -8,6 +8,7 @@ import Spinner from '../../../components/UI/Spinner/Spinner';
 import Input from '../../../components/UI/Input/Input';
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 import * as actions from '../../../store/actions/'
+import {updateObject, checkValidity} from '../../../shared/utility';
 class ContactData extends Component {
     state = {
         orderForm: {
@@ -77,7 +78,8 @@ class ContactData extends Component {
                 },
                 value: '',
                 validation: {
-                    required: true
+                    required: true,
+                    isEmail:true
                 },
                 valid: false,
                 touched: false,
@@ -100,16 +102,17 @@ class ContactData extends Component {
     }
 
     inputChangedHandler = (event, inputId) => {
-        const updatedForm = {
-            ...this.state.orderForm
-        }
-        const updatedFormElem = {
-            ...updatedForm[inputId]
-        }
-        updatedFormElem.value = event.target.value;
-        updatedFormElem.valid = this.checkValidity(updatedFormElem.value, updatedFormElem.validation);
-        updatedFormElem.touched = true;
-        updatedForm[inputId] = updatedFormElem;
+        
+        const updatedFormElem = updateObject(this.state.orderForm[inputId],{
+            value: event.target.value,
+            valid: checkValidity(event.target.value, this.state.orderForm[inputId].validation),
+            touched:true,
+
+        });
+
+        const updatedForm = updateObject(this.state.orderForm,{
+            [inputId]:updatedFormElem
+        });
 
         let formIsValid = true;
         for (let inputIdentifier in updatedForm) {
@@ -117,36 +120,6 @@ class ContactData extends Component {
         }
 
         this.setState({ orderForm: updatedForm, formIsValid });
-    }
-
-    checkValidity(value, rule) {
-        let isValid = true;
-
-        if (!rule) return isValid;
-
-        if (rule.required) {
-            isValid = value.trim() !== '' && isValid;
-        }
-
-        if (rule.minLength) {
-            isValid = value.length >= rule.minLength && isValid;
-        }
-
-        if (rule.maxLength) {
-            isValid = value.length <= rule.maxLength && isValid;
-        }
-
-        if (rule.isEmail) {
-            const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-            isValid = pattern.test(value) && isValid
-        }
-
-        if (rule.isNumeric) {
-            const pattern = /^\d+$/;
-            isValid = pattern.test(value) && isValid
-        }
-
-        return isValid
     }
 
     orderHandler = (event) => {
